@@ -12,4 +12,4 @@ javac -d build -cp src\dependencies\apacheio.jar src\*.java src\io\*.java src\io
 :: echo Project running.
 
 :: Run Project (Binaries Read from "build" Directory)
-java -cp build;src\dependencies\apacheio.jar -Xms1300m -Xmx1300m Main
+java -cp build;src\dependencies\apacheio.jar -Xms1400m -Xmx1400m -Djava.awt.headless=true Main

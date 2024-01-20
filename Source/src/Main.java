@@ -15,8 +15,9 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         int MINIMUM_IMAGES = 3;
-        int IMAGES_TO_ANALYZE = 20;
+        int IMAGES_TO_ANALYZE = 40;
         int IMAGE_HEIGHT = 500;
+        int SLICE_OFFSET = 0;
 
         List<File> images = FileManager.getDirectoryFiles(new File("input"));
 
@@ -38,7 +39,7 @@ public class Main {
                     pixelColors.add(new ArrayList<>());
                     for (int y = 0; y < imageHeight; y++) {
                         pixelColors.get(x).add(new ArrayList<>());
-                        Color color = new Color(buffImage.getRGB(x, 750 + y));
+                        Color color = new Color(buffImage.getRGB(x, SLICE_OFFSET + y));
 
                         // Add Red Component
                         if (pixelColors.get(x).get(y).size() < 1) pixelColors.get(x).get(y).add(color.getRed());
@@ -58,15 +59,14 @@ public class Main {
             // Create Denoised Image
             BufferedImage bi = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_BGR);
             for(int x = 0; x < imageWidth; x++) {
-                System.out.println("Calculating column #" + x + " colors.");
                 for(int y = 0; y < imageHeight; y++) {
                     bi.setRGB(
                             x,
                             y,
                             new Color(
-                                    pixelColors.get(x).get(y).get(0) / IMAGES_TO_ANALYZE,
-                                    pixelColors.get(x).get(y).get(1) / IMAGES_TO_ANALYZE,
-                                    pixelColors.get(x).get(y).get(2) / IMAGES_TO_ANALYZE
+                                    Math.min(Math.max(pixelColors.get(x).get(y).get(0) / IMAGES_TO_ANALYZE, 0), 255),
+                                    Math.min(Math.max(pixelColors.get(x).get(y).get(1) / IMAGES_TO_ANALYZE, 0), 255),
+                                    Math.min(Math.max(pixelColors.get(x).get(y).get(2) / IMAGES_TO_ANALYZE, 0), 255)
                             ).getRGB()
                     );
                 }
