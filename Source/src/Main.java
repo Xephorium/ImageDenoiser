@@ -25,7 +25,7 @@ public class Main {
             // Read First Image Data
             BufferedImage bufferedImage = ImageIO.read(images.get(0));
             int imageWidth = bufferedImage.getWidth();
-            int imageHeight = IMAGE_HEIGHT; //bufferedImage.getHeight();
+            int imageHeight = IMAGE_HEIGHT; // bufferedImage.getHeight();
 
             // Initialize Color List
             ArrayList<ArrayList<ArrayList<Integer>>> pixelColors = new ArrayList<>();
@@ -38,44 +38,43 @@ public class Main {
                     pixelColors.add(new ArrayList<>());
                     for (int y = 0; y < imageHeight; y++) {
                         pixelColors.get(x).add(new ArrayList<>());
-                        pixelColors.get(x).get(y).add(buffImage.getRGB(x, 750 + y));
-                    }
-                }
-            }
+                        Color color = new Color(buffImage.getRGB(x, 750 + y));
 
-            // Get Average Pixel Value
-            ArrayList<ArrayList<Color>> averagePixelColors = new ArrayList<>();
-            for (int x = 0; x < imageWidth; x++) {
-                averagePixelColors.add(new ArrayList<>());
-                for (int y = 0; y < imageHeight; y++) {
-                    int r = 0;
-                    int g = 0;
-                    int b = 0;
-                    for (int i = 0; i < IMAGES_TO_ANALYZE; i++) {
-                        Color color = new Color(pixelColors.get(x).get(y).get(i));
-                        r += color.getRed();
-                        g += color.getGreen();
-                        b += color.getBlue();
+                        // Add Red Component
+                        if (pixelColors.get(x).get(y).size() < 1) pixelColors.get(x).get(y).add(color.getRed());
+                        pixelColors.get(x).get(y).set(0, pixelColors.get(x).get(y).get(0) + color.getRed());
+
+                        // Add Green Component
+                        if (pixelColors.get(x).get(y).size() < 2) pixelColors.get(x).get(y).add(color.getGreen());
+                        pixelColors.get(x).get(y).set(1, pixelColors.get(x).get(y).get(1) + color.getGreen());
+
+                        // Add Blue Component
+                        if (pixelColors.get(x).get(y).size() < 3) pixelColors.get(x).get(y).add(color.getBlue());
+                        pixelColors.get(x).get(y).set(2, pixelColors.get(x).get(y).get(2) + color.getBlue());
                     }
-                    averagePixelColors.get(x).add(new Color(
-                            r / IMAGES_TO_ANALYZE,
-                            g / IMAGES_TO_ANALYZE,
-                            b / IMAGES_TO_ANALYZE
-                    ));
                 }
             }
 
             // Create Denoised Image
             BufferedImage bi = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_BGR);
             for(int x = 0; x < imageWidth; x++) {
+                System.out.println("Calculating column #" + x + " colors.");
                 for(int y = 0; y < imageHeight; y++) {
-                    bi.setRGB(x, y, averagePixelColors.get(x).get(y).getRGB());
+                    bi.setRGB(
+                            x,
+                            y,
+                            new Color(
+                                    pixelColors.get(x).get(y).get(0) / IMAGES_TO_ANALYZE,
+                                    pixelColors.get(x).get(y).get(1) / IMAGES_TO_ANALYZE,
+                                    pixelColors.get(x).get(y).get(2) / IMAGES_TO_ANALYZE
+                            ).getRGB()
+                    );
                 }
             }
 
             // Write to Output File
             try {
-                // javax.imageio.ImageIO:
+                System.out.println("Writing to Output File");
                 ImageIO.write(bi, "PNG", new File("output/output.png"));
             } catch (IOException e) {
                 e.printStackTrace();
